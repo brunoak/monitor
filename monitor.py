@@ -1,36 +1,49 @@
+import os
+from dotenv import load_dotenv
 from modelos import Dolar, Bitcoin
 from alerta_telegram import enviar_alerta
-import time
 
-def monitorar_mercado():
+# Carrega as variáveis de ambiente na memória central
+load_dotenv()
+
+def vigiar_mercado():
+    print("Arkad acordou. Analisando o mercado...")
+    
+    # Parâmetro de sensibilidade do mentor
+    GATILHO_ALERTA = 2.0 
+    
     moeda_dolar = Dolar()
     moeda_btc = Bitcoin()
-
-    # Buscando o pacote completo (Valor + Variação)
+    
     dados_dolar = moeda_dolar.buscar_dados_completos()
     dados_btc = moeda_btc.buscar_dados_completos()
     
-    # Defesa caso a API caia
-    if dados_dolar is None or dados_btc is None:
-        print("Falha ao buscar dados na API. Tentando novamente na próxima hora.")
-        return
-
-    # Extraindo as variações
-    var_dolar = dados_dolar['variacao']
-    var_btc = dados_btc['variacao']
-
-    # Regra de Negócio: Se variar mais de 2% (para cima ou para baixo) nas últimas 24h
-    if (var_dolar >= 2.0 or var_dolar <= -2.0) or (var_btc >= 2.0 or var_btc <= -2.0):
-        mensagem = (f"🚨 ALERTA ARKAD (Variação Diária)!\n"
-                    f"💵 Dólar: R$ {dados_dolar['valor']:.2f} ({var_dolar}%)\n"
-                    f"🪙 Bitcoin: USD {dados_btc['valor']:,.2f} ({var_btc}%)")
+    # 🕵️‍♂️ ANÁLISE DO DÓLAR
+    if dados_dolar:
+        variacao_dolar = dados_dolar['variacao']
+        valor_dolar = dados_dolar['valor']
         
-        enviar_alerta(mensagem)
-        print("Alerta enviado com sucesso!")
-    else:
-        print(f"Mercado estável. Dólar variou {var_dolar}% e BTC {var_btc}%. Nenhum alerta necessário.")
+        if abs(variacao_dolar) >= GATILHO_ALERTA:
+            icone = "🚀" if variacao_dolar > 0 else "📉"
+            msg = f"🚨 *ALERTA DÓLAR* {icone}\n\nMovimentação detectada!\nVariação: *{variacao_dolar:.2f}%*\nCotação atual: *R$ {valor_dolar:.4f}*"
+            enviar_alerta(msg)
+        else:
+            print(f"Dólar estável. Variação atual: {variacao_dolar:.2f}%. Nenhuma ação necessária.")
 
-while True:
-    monitorar_mercado()
-    print("Checagem concluída. Dormindo por 1 hora...\n")
-    time.sleep(3600)
+    # 🕵️‍♂️ ANÁLISE DO BITCOIN
+    if dados_btc:
+        variacao_btc = dados_btc['variacao']
+        valor_btc = dados_btc['valor']
+        
+        if abs(variacao_btc) >= GATILHO_ALERTA:
+            icone = "🚀" if variacao_btc > 0 else "📉"
+            # Formatando BTC com separador de milhar
+            msg = f"🚨 *ALERTA BITCOIN* {icone}\n\nMovimentação detectada!\nVariação: *{variacao_btc:.2f}%*\nCotação atual: *USD {valor_btc:,.2f}*"
+            enviar_alerta(msg)
+        else:
+            print(f"Bitcoin estável. Variação atual: {variacao_btc:.2f}%. Nenhuma ação necessária.")
+            
+    print("Análise concluída. Arkad voltando a dormir.")
+
+if __name__ == "__main__":
+    vigiar_mercado()
