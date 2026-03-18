@@ -1,0 +1,29 @@
+name: Monitor De Cotacao
+
+on:
+  schedule:
+    # Roda a cada 2 horas. Você pode mudar depois se quiser.
+    - cron: '0 */1 * * *' 
+  workflow_dispatch: 
+
+jobs:
+  rodar-robo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v3
+
+      - name: Preparar o Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Instalar bibliotecas
+        run: pip install -r requirements.txt
+
+      - name: Acordar o Arkad e enviar mensagem
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          MEU_CHAT_ID: ${{ secrets.MEU_CHAT_ID }}
+          AWESOME_API_KEY: ${{ secrets.AWESOME_API_KEY }}
+        run: python monitor.py
