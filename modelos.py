@@ -19,7 +19,7 @@ class Dolar(AtivoFinanceiro):
     def __init__(self, nome="Dólar Americano"):
         super().__init__(nome)
         
-    def buscar_cotacao_online(self):
+   def buscar_cotacao_online(self):
         try:
             url = 'https://economia.awesomeapi.com.br/json/last/USD-BRL'
             headers = {"x-api-key": API_KEY}
@@ -27,7 +27,14 @@ class Dolar(AtivoFinanceiro):
             
             if response.status_code == 200:
                 data = response.json()
-                return float(data['USDBRL']['bid'])    
+                return float(data['USDBRL']['bid'])
+            
+            # 🚨 MODO DETETIVE ATIVADO 🚨
+            print("--- INVESTIGAÇÃO DA API ---")
+            print(f"A chave carregou do Secrets?: {API_KEY is not None}")
+            print(f"Status do Erro: {response.status_code}")
+            print(f"Mensagem da API: {response.text}")
+            print("---------------------------")
             return None
         
         except RequestException as req_err:
