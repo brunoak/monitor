@@ -19,7 +19,7 @@ class Dolar(AtivoFinanceiro):
     def __init__(self, nome="Dólar Americano"):
         super().__init__(nome)
         
-   def buscar_cotacao_online(self):
+    def buscar_cotacao_online(self):
         try:
             url = 'https://economia.awesomeapi.com.br/json/last/USD-BRL'
             headers = {"x-api-key": API_KEY}
