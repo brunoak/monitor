@@ -1,6 +1,6 @@
 # 📈 Monitor de Cotação Dolar/Bitcoin
 
-Este é um microsserviço de monitoramento da cotação do dolar e Bitcoin desenvolvido em Python.
+Este é um microsserviço de monitoramento da cotação e conversor de dolar e Bitcoin desenvolvido em Python.
 
 O projeto é dividido em duas frentes independentes: uma **Interface Web** para consulta em tempo real e um **Bot Autônomo** no Telegram, alertando sobre volatilidades do mercado.
 
